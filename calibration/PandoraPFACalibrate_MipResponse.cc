@@ -185,9 +185,14 @@ GeVToMIP::~GeVToMIP()
 
 void GeVToMIP::MakeHistograms()
 {
+    std::cout << "Input ROOT files: " << m_inputMuonRootFiles << std::endl;
+
     unsigned int found_slash = m_inputMuonRootFiles.find_last_of("/");
     std::string path = m_inputMuonRootFiles.substr(0,found_slash);
     std::string file = m_inputMuonRootFiles.substr(found_slash+1);
+
+    std::cout << "Path: " << path << std::endl;
+    std::cout << "File: " << file << std::endl;
 
     unsigned int found_star = file.find_last_of("*");
     std::string file_prefix = file.substr(0,found_star);
@@ -208,6 +213,7 @@ void GeVToMIP::MakeHistograms()
             if (!pTSystemFile->IsDirectory() && fname.EndsWith(file_suffix.c_str()) && fname.BeginsWith(file_prefix.c_str()))
             {
                 TString filename(path + "/" + fname);
+                std::cout << "Opening file " << filename << std::endl;
                 TFile *i_file = new TFile(filename);
                 TH1F *i_hECalDirectionCorrectedCaloHitEnergy = (TH1F*) i_file->Get("ECalDirectionCorrectedCaloHitEnergy");
                 TH1F *i_hHCalDirectionCorrectedCaloHitEnergy = (TH1F*) i_file->Get("HCalDirectionCorrectedCaloHitEnergy");
@@ -226,6 +232,10 @@ void GeVToMIP::MakeHistograms()
                         i_file->cd();
                     }
                 }
+                else {
+                    std::cerr << "ERROR: histogram ECalDirectionCorrectedCaloHitEnergy not found" << std::endl;
+                }
+
 
                 if (i_hHCalDirectionCorrectedCaloHitEnergy!=NULL)
                 {
@@ -239,6 +249,9 @@ void GeVToMIP::MakeHistograms()
                         m_hHCalDirectionCorrectedCaloHitEnergy = (TH1F*)i_hHCalDirectionCorrectedCaloHitEnergy->Clone("HCalDirectionCorrectedCaloHitEnergy");
                         i_file->cd();
                     }
+                }
+                else {
+                    std::cerr << "ERROR: histogram HCalDirectionCorrectedCaloHitEnergy not found" << std::endl;
                 }
 
                 if (i_hMuonDirectionCorrectedCaloHitEnergy!=NULL)
@@ -254,21 +267,31 @@ void GeVToMIP::MakeHistograms()
                         i_file->cd();
                     }
                 }
+                else {
+                    std::cerr << "ERROR: histogram HCalDirectionCorrectedCaloHitEnergy not found" << std::endl;
+                }
 
                 delete i_hECalDirectionCorrectedCaloHitEnergy;
                 delete i_hHCalDirectionCorrectedCaloHitEnergy;
                 delete i_hMuonDirectionCorrectedCaloHitEnergy;
                 delete i_file;
             }
+            else {
+                ;
+            }
         }
     }
+    else {
+        std::cerr << "ERROR: files not found" << std::endl;
+    }
 
-    if (m_hECalDirectionCorrectedCaloHitEnergy==NULL)
-        m_hECalDirectionCorrectedCaloHitEnergy = new TH1F();
-    if (m_hHCalDirectionCorrectedCaloHitEnergy==NULL)
-        m_hHCalDirectionCorrectedCaloHitEnergy = new TH1F();
-    if (m_hMuonDirectionCorrectedCaloHitEnergy==NULL)
-        m_hMuonDirectionCorrectedCaloHitEnergy = new TH1F();
+    if (m_hECalDirectionCorrectedCaloHitEnergy==NULL ||
+        m_hHCalDirectionCorrectedCaloHitEnergy==NULL ||
+        m_hMuonDirectionCorrectedCaloHitEnergy==NULL) {
+        std::cerr << "ERROR: at least one of the needed histograms is missing, quitting..." << std::endl;
+        std::exit(-1);
+    }
+
 
     m_hECalDirectionCorrectedCaloHitEnergy->Sumw2();
     m_hHCalDirectionCorrectedCaloHitEnergy->Sumw2();
@@ -377,10 +400,10 @@ bool ParseCommandLine(int argc, char *argv[], GeVToMIP &geVToMIP)
             break;
         case 'd':
         default:
-            std::cout << std::endl << "Calibrate " << std::endl
-                      << "    -a        (mandatory, input file name(s), can include wildcards if string is in quotes)   " << std::endl
-                      << "    -b value  (mandatory, true energy of muons being used for calibration)                    " << std::endl
-                      << "    -c value  (mandatory, output path to send results to)                                     " << std::endl
+            std::cout << std::endl << "PandoraPFACalibrate_MipResponse " << std::endl
+                      << "    -a[file]    (mandatory, input file name(s), can include wildcards if string is in quotes)   " << std::endl
+                      << "    -b[energy]  (mandatory, true energy of muons being used for calibration)                    " << std::endl
+                      << "    -c[path]    (mandatory, output path to send results to)                                     " << std::endl
                       << std::endl;
             return false;
         }
