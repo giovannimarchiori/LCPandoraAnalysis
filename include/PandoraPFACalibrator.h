@@ -37,8 +37,8 @@ due to the isolation cuts used in PandoraPFA this is not quite the case.
 
 MC Samples:
 ===========
-  o the calibration constants will depend on the Mokka ECAL and HCAL 
-    drivers, the GEANT4 physics list, and potentially the version of 
+  o the calibration constants will depend on the Mokka ECAL and HCAL
+    drivers, the GEANT4 physics list, and potentially the version of
     GEANT4 used to generate the events.
   o to calibrate PandoraPFA generate the following samples with the
     same version of Mokka/Geant4 used for the main event samples:
@@ -51,10 +51,10 @@ Calibration Procedure:
 i) Calibration of Mokka hits
   o Using the photon sample, tune the calibration parameters in digitisation processor
     e.g. <parameter name="CalibrECAL" type="FloatVec">XX YY</parameter>
-    to so that the histogram fCalEnergy is centred on 10 GeV. It is recommended 
+    to so that the histogram fCalEnergy is centred on 10 GeV. It is recommended
     that the calibration constants for the different layers should be in the ratio
     of the absorber thicknesses, i.e. 1:2 for ILD_o1_v05.
-  o Repeat with the 10 GeV KL sample to fix 
+  o Repeat with the 10 GeV KL sample to fix
     <parameter name="CalibrHCAL" type="FloatVec">ZZ</parameter>
 ii) PandoraPFA MIP calibration
   o Using the muon sample, tune the parameters:
@@ -83,6 +83,10 @@ public:
     virtual Processor *newProcessor();
     PandoraPFACalibrator() ;
 
+    // Delete copy constructor and copy assignment operator
+    PandoraPFACalibrator(const PandoraPFACalibrator&) = delete;
+    PandoraPFACalibrator& operator=(const PandoraPFACalibrator&) = delete;
+
     /**
      *   @brief Called at the begin of the job before anything is read. Use to initialize the processor, e.g. book histograms.
      */
@@ -96,12 +100,12 @@ public:
     /**
      *  @brief  Called for every event - the working horse.
      */
-    virtual void processEvent( LCEvent * evt ) ; 
+    virtual void processEvent( LCEvent * evt ) ;
 
     /**
      *  @brief  Check
      */
-    virtual void check( LCEvent * evt ) ; 
+    virtual void check( LCEvent * evt ) ;
 
     /**
      *  @brief  Called after data processing for clean up.
@@ -215,7 +219,13 @@ private:
     TH1F           *m_hECalBarrelMIPCorr;                           ///< 
     TH1F           *m_hECalEndCapMIPCorr;                           ///< 
     TH1F           *m_hHCalMIPCorr;                                 ///< 
-    TH1F           *m_hMuonMIPCorr;                                 ///< 
+    TH1F           *m_hMuonMIPCorr;                                 ///<
+
+    std::string    m_defaultEncoding;                               ///<
+    std::string    m_ecalBarrelEncoding;                            ///<
+    std::string    m_ecalEndCapEncoding;                            ///<
+    std::string    m_hcalEncoding;                                  ///<
+    std::string    m_muonEncoding;                                  ///<
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

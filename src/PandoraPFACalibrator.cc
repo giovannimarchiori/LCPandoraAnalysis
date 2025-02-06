@@ -207,6 +207,32 @@ PandoraPFACalibrator::PandoraPFACalibrator() :
         "The maximum hadronic energy allowed for a single hcal hit",
         m_maxHCalHitHadronicEnergy,
         10000.f);
+
+    registerProcessorParameter("DefaultEncoding",
+        "Default cellID encoding",
+        m_defaultEncoding,
+        std::string("M:3,S-1:3,I:9,J:9,K-1:6"));
+
+    registerProcessorParameter("ECALBarrelEncoding",
+        "ECal barrel cellID encoding",
+        m_ecalBarrelEncoding,
+        std::string(""));
+
+    registerProcessorParameter("ECALEndCapEncoding",
+        "ECal endcap cellID encoding",
+        m_ecalEndCapEncoding,
+        std::string(""));
+
+    registerProcessorParameter("HCALEncoding",
+        "HCal cellID encoding",
+        m_hcalEncoding,
+        std::string(""));
+
+    registerProcessorParameter("MUONEncoding",
+        "Muon cellID encoding",
+        m_muonEncoding,
+        std::string(""));
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -227,7 +253,8 @@ void PandoraPFACalibrator::init()
     m_recoPfoCollections.clear();
     m_recoPfoCollections.insert(m_recoPfoCollections.begin(), uniqueRecoPfoCollections.begin(), uniqueRecoPfoCollections.end());
 
-    CellIDDecoder<CalorimeterHit>::setDefaultEncoding("M:3,S-1:3,I:9,J:9,K-1:6");
+    CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_defaultEncoding);
+
 
     this->printParameters();
 
@@ -331,15 +358,36 @@ void PandoraPFACalibrator::processEvent(LCEvent *pLCEvent)
     this->ReadMCParticles(pLCEvent, m_mcPfoCollections, cosTheta);
 
     // Read hit collections
-    float ecalBarrelEnergy(0.f), ecalEndCapEnergy(0.f);
-    this->ReadHitEnergies(pLCEvent, m_ecalBarrelCollections, ecalBarrelEnergy, m_ecalToMIP, m_hECalBarrelMIP, m_hECalBarrelMIPCorr, "K-1", m_hEcalBarrelEnergyByLayer);
-    this->ReadHitEnergies(pLCEvent, m_ecalEndCapCollections, ecalEndCapEnergy, m_ecalToMIP, m_hECalEndCapMIP, m_hECalEndCapMIPCorr, "K-1", m_hEcalEndCapEnergyByLayer);
+    float ecalBarrelEnergy(0.f);
+    if (m_ecalBarrelEncoding != "")
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_ecalBarrelEncoding);
+    else
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_defaultEncoding);
+    this->ReadHitEnergies(pLCEvent, m_ecalBarrelCollections, ecalBarrelEnergy, m_ecalToMIP, m_hECalBarrelMIP, m_hECalBarrelMIPCorr, "layer", m_hEcalBarrelEnergyByLayer);
 
-    float hcalEnergy(0.f), muonEnergy(0.f);
+    float ecalEndCapEnergy(0.f);
+    if (m_ecalEndCapEncoding != "")
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_ecalEndCapEncoding);
+    else
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_defaultEncoding);
+    this->ReadHitEnergies(pLCEvent, m_ecalEndCapCollections, ecalEndCapEnergy, m_ecalToMIP, m_hECalEndCapMIP, m_hECalEndCapMIPCorr, "layer", m_hEcalEndCapEnergyByLayer);
+
+    float hcalEnergy(0.f);
+    if (m_hcalEncoding != "")
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_hcalEncoding);
+    else
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_defaultEncoding);
     this->ReadHitEnergies(pLCEvent, m_hcalCollections, hcalEnergy, m_hcalToMIP, m_hHCalMIP, m_hHCalMIPCorr);
+
+    float muonEnergy(0.f);
+    if (m_muonEncoding != "")
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_muonEncoding);
+    else
+      CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_defaultEncoding);
     this->ReadHitEnergies(pLCEvent, m_muonCollections, muonEnergy, m_muonToMIP, m_hMuonMIP, m_hMuonMIPCorr);
 
     float lcalEnergy(0.f), lhcalEnergy(0.f), bcalEnergy(0.f);
+    CellIDDecoder<CalorimeterHit>::setDefaultEncoding(m_defaultEncoding);
     this->ReadHitEnergies(pLCEvent, m_lcalCollections, lcalEnergy);
     this->ReadHitEnergies(pLCEvent, m_lhcalCollections, lhcalEnergy);
     this->ReadHitEnergies(pLCEvent, m_bcalCollections, bcalEnergy);
