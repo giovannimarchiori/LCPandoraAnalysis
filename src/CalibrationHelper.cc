@@ -615,7 +615,7 @@ void CalibrationHelper::ReadSimCaloHitEnergies(const EVENT::LCEvent *pLCEvent, c
 
                     if (NULL == pSimCalorimeterHit)
                     {
-                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type CalorimeterHit " << std::endl;
+                        streamlog_out(ERROR) << "Collection type mismatch " << (*iter) << " expected to contain objects of type SimCalorimeterHit " << std::endl;
                         throw;
                     }
 
