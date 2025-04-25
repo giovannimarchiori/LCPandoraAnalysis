@@ -65,6 +65,7 @@ public:
         LCStrVec    m_lHCalCollectionsSimCaloHit{};           ///< Input simcalorimeter hit collection names
         LCStrVec    m_lCalCollectionsSimCaloHit{};            ///< Input simcalorimeter hit collection names
 
+        // GM: also bins and max values of other hists could be made configurable..
         int         m_nBinsMuonCaloHitEnergyHist;             ///< Number of bins in MuonDirectionCorrectedCaloHitEnergy histogram 
         float       m_xUpperValueMuonCaloHitEnergyHist;       ///< Upper value of x-range of MuonDirectionCorrectedCaloHitEnergy histogram 
     };

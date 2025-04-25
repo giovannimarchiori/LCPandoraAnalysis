@@ -184,7 +184,7 @@ void CalibrationHelper::CreateHistograms()
     m_hECalDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in ECal");
     m_hECalDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
 
-    m_hHCalDirectionCorrectedCaloHitEnergy = new TH1F("HCalDirectionCorrectedCaloHitEnergy", "1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 0.1);
+    m_hHCalDirectionCorrectedCaloHitEnergy = new TH1F("HCalDirectionCorrectedCaloHitEnergy", "1==nPfoTargetsTotal && 1==nPfoTargetsTracks", 500, 0., 0.5);
     m_hHCalDirectionCorrectedCaloHitEnergy->GetXaxis()->SetTitle("Direction Corrected Calo Hit Energy in HCal");
     m_hHCalDirectionCorrectedCaloHitEnergy->GetYaxis()->SetTitle("Entries");
 
@@ -428,6 +428,7 @@ int CalibrationHelper::GetNHCalLayersFromEdge(const EVENT::CalorimeterHit *const
   
     if (cht.is(CHT::hcal) != true)
     {
+        streamlog_out(DEBUG) << "Hit is not from HCAL" << std::endl;
         throw CaloHitException();
     }
 

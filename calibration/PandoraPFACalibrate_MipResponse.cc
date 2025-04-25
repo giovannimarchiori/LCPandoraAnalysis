@@ -268,7 +268,7 @@ void GeVToMIP::MakeHistograms()
                     }
                 }
                 else {
-                    std::cerr << "ERROR: histogram HCalDirectionCorrectedCaloHitEnergy not found" << std::endl;
+                    std::cerr << "ERROR: histogram MuonDirectionCorrectedCaloHitEnergy not found" << std::endl;
                 }
 
                 delete i_hECalDirectionCorrectedCaloHitEnergy;
